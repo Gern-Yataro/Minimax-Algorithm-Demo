@@ -1,10 +1,14 @@
+body {
+  font-family: 'PT Serif', serif;
+}
+
 #board {
   background: #fff;
   border-radius: 2px;
-  width: 45vw;
-  height: 45vw;
+  width: 90vw;
+  height: 90vw;
   margin: auto;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -32,19 +36,37 @@ table tr td:last-child {
 
 td {
   border: 2px solid #333;
-  height: 14vw;
-  width: 14vw;
+  height: 30vw;
+  width: 30vw;
   text-align: center;
   cursor: pointer;
-  font-size: 70px;
+  font-size: 2em;
+  white-space:nowrap;
 }
 
 .endgame {
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
   display: none;
   position: absolute;
-  height: 100px;
-  width: 200px;
-  background-color: orange;
+  height: auto; 
+  width: 70%;
+  background-color: #fff;
   top: 50%;
   left: 50%;
+  font-size: 20px;
+  padding: 20px 20px 20px 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.text {
+  padding-bottom: 20px;
+}
+
+button {
+  background-color: white;
+  color: black;
+  border: 2px solid #555555;
+  width: 100%;
+  padding: 20px 20px 20px 20px;
 }
