@@ -1,6 +1,7 @@
 var boardGrid;
 var huPlayer = "O";
 var aiPlayer = "X";
+var firstAIMove = true;
 const winCombo = [
   [0, 1, 2],
   [3, 4, 5],
@@ -15,12 +16,23 @@ const winCombo = [
 const cells = document.querySelectorAll(".cell");
 startGame();
 
-//initialise board with empty cells
 function startGame() {
   document.querySelector(".endgame").style.display = "none";
   boardGrid = Array.from(Array(9).keys());
   for(i = 0; i < cells.length; i++){
-    cells[i].innerHTML = "";
+    cells[i].innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    cells[i].style.removeProperty("background-color");
+    cells[i].addEventListener("click", turnClick, false);
+  }
+}
+
+//initialise board with empty cells
+function startGame() {
+  firstAIMove = true;
+  document.querySelector(".endgame").style.display = "none";
+  boardGrid = Array.from(Array(9).keys());
+  for(i = 0; i < cells.length; i++){
+    cells[i].innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     cells[i].style.removeProperty("background-color");
     cells[i].addEventListener("click", turnClick, false);
   }
@@ -30,7 +42,8 @@ function startGame() {
 function turnClick(square) {
   if(typeof boardGrid[square.target.id] == 'number'){
     turn(square.target.id, huPlayer);
-    if (!checkTie()) turn(bestSpot(), aiPlayer);
+    if (!checkTie() && firstAIMove == false) setTimeout(function(){turn(bestSpot(), aiPlayer); }, 100);
+    if (firstAIMove == true) turn(firstAISpot(), aiPlayer);
   }
 
 }
@@ -58,7 +71,7 @@ function checkWin(board, player) {
 function gameOver(gameWon) {
   for(let index of winCombo[gameWon.index]){
     document.getElementById(index).style.backgroundColor = 
-      gameWon.player == huPlayer ? "blue" : "red";
+      gameWon.player == huPlayer ? "#64B5F6" : "#E57373";
   }
   for(var i = 0; i < cells.length; i++) {
     cells[i].removeEventListener('click', turnClick, false);
@@ -76,13 +89,24 @@ function declareWinner(who){
 }
 
 function bestSpot() {
-  return minimax(boardGrid, aiPlayer).index;
+  return minimax(boardGrid, aiPlayer, 0).index;
+}
+
+function firstAISpot() {
+  firstAIMove = false;
+  var corners = [0, 2, 6, 8];
+  var availSpots = emptySquares();
+  if(availSpots.indexOf(4) !== -1){
+      return 4;
+  }
+  var availCornerSpots = availSpots.filter(value => -1 !== corners.indexOf(value));
+  return availCornerSpots[Math.floor(Math.random() * availCornerSpots.length)];
 }
 
 function checkTie() {
   if(emptySquares().length == 0) {
     for(var i = 0; i < cells.length; i++) {
-      cells[i].style.backgroundColor = "green";
+      cells[i].style.backgroundColor = "#81C784";
     }
     declareWinner("Tie Game!");
     return true;
@@ -90,14 +114,16 @@ function checkTie() {
   return false;
 }
 
-function minimax(newBoard, player) {
+function minimax(newBoard, player, depth) {
 	var availSpots = emptySquares();
 
   //checks for terminal states (win/lose)
 	if (checkWin(newBoard, huPlayer)) {
-		return {score: -10};
+    var temp = -10 + depth;
+		return {score: temp};
 	} else if (checkWin(newBoard, aiPlayer)) {
-		return {score: 10};
+    var temp = 10 - depth;
+		return {score: temp};
 	} else if (availSpots.length === 0) {
 		return {score: 0};
 	}
@@ -110,10 +136,12 @@ function minimax(newBoard, player) {
 		newBoard[availSpots[i]] = player;
 
 		if (player == aiPlayer) {
-			var result = minimax(newBoard, huPlayer);
+      var tempDepth = depth + 1;
+			var result = minimax(newBoard, huPlayer, tempDepth);
 			move.score = result.score;
 		} else {
-			var result = minimax(newBoard, aiPlayer);
+      var tempDepth = depth + 1;
+			var result = minimax(newBoard, aiPlayer, tempDepth);
 			move.score = result.score;
 		}
 
